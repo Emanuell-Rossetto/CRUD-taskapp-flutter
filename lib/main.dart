@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Lista de Tarefas',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
       ),
       home: const TaskListPage(),
@@ -33,6 +33,7 @@ class _TaskListPageState extends State<TaskListPage> {
   final TaskRepository _repository = TaskRepository();
   List<TaskModel> _tasks = [];
   bool _isLoading = true;
+  bool _showAdvancedDetails = false;
 
   @override
   void initState() {
@@ -164,6 +165,21 @@ class _TaskListPageState extends State<TaskListPage> {
       appBar: AppBar(
         title: const Text('Minhas Tarefas'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          Row(
+            children: [
+              const Text("Detalhes", style: TextStyle(fontSize: 12)),
+              Switch(
+                value: _showAdvancedDetails,
+                onChanged: (value) {
+                  setState(() {
+                    _showAdvancedDetails = value;
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -197,7 +213,20 @@ class _TaskListPageState extends State<TaskListPage> {
                                 : null,
                           ),
                         ),
-                        subtitle: Text('Criada em: ${task.created.substring(0, 10)}'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Criada em: ${task.created.substring(0, 10)}'),
+                            if (_showAdvancedDetails)
+                              Text(
+                                'ID: ${task.id}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blueGrey,
+                                ),
+                              ),
+                          ],
+                        ),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_outline, color: Colors.red),
                           onPressed: () async {
